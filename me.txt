@@ -1,0 +1,3 @@
+https://www.vitejs.net/guide/#scaffolding-your-first-vite-project
+pnpm create vite
+github创建一个空项目，按照提示将本地代码push到github
