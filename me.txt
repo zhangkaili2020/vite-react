@@ -1,3 +1,73 @@
 https://www.vitejs.net/guide/#scaffolding-your-first-vite-project
 pnpm create vite
 github创建一个空项目，按照提示将本地代码push到github
+
+登录git用户名邮箱
+git config --global user.name "zhangkaili"
+git config --global user.email "18844110157@163.com"
+
+
+https://juejin.cn/post/7131019849047900197
+1. 使用editorConfig统一不同编辑器的编码风格
+# http://editorconfig.org
+root = true # 表明这是最顶层的editorConfig配置文件
+
+[*] # 表示适用于所有文件
+charset = utf-8 # 字符集 utf-8
+indent_style = tab # 缩进风格 space|tab
+indent_size = 2 # 缩进大小是几个空格
+end_of_line = lf # 控制换行类型 lf|cr|crlf
+trim_trailing_whitespace = true # 去除行首任意空白字符
+insert_final_newline = true # 始终在文件末尾插入一个新行
+
+[*.md] # 表示仅 md 文件适用以下规则
+max_line_length = off
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab # Makefile 文件缩进风格
+或者https://juejin.cn/post/6980604520124383245参见prettierrc 配置文件说明
+增加配置后安装EditorConfig for VS Code插件即可
+
+2. 使用prettier统一不同编辑器的代码风格
+在根目录下创建.prettierrc.js(也可以不加后缀，默认是json配置)，内容如下
+{
+	"tabWidth": 2,
+	"printWidth": 120, // 1行最多120个字符
+	"singleQuote": true, // 使用单引号
+	"trailingComma": "none", // trailingComma: 'all', // 末尾要有逗号
+	"bracketSpacing": true, // 对象大括号直接是否有空格
+	// "jsxBracketSameLine": false, // jsx的>是否单独放一行
+	// "arrowParens": "always", // (x) => {} 箭头函数参数只有一个时是否要有小括号
+	"proseWrap": "preserve", // 针对markdown文件，如果超过了最大字符数 always 换行| never 不换行| preserve 原样展示
+	"semi": false, // 不要分号结尾
+	"htmlWhitespaceSensitivity": "ignore" // html空格是否敏感
+}
+
+pnpm i -D prettier eslint-plugin-prettier eslint-config-prettier
+eslint-config-prettier: 关闭 Eslint 中与 Prettier 冲突的选项
+eslint-plugin-prettier 将 prettier 的规则设置为 eslint 的规则，对不符合规则的进行提示
+
+3.prettierignore，忽略不需要格式化的内容（参见antd pro创建项目的.prettierignore）
+**/*.svg
+/dist
+.dockerignore
+.DS_Store
+.eslintignore
+*.png
+*.toml
+docker
+.editorconfig
+Dockerfile*
+.gitignore
+.prettierignore
+LICENSE
+.eslintcache
+*.lock
+yarn-error.log
+.history
+CNAME
+/build
+/public
+**/*.sh
+
