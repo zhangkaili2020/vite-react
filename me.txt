@@ -7,6 +7,7 @@ git config --global user.name "zhangkaili"
 git config --global user.email "18844110157@163.com"
 
 
+一. 配置prettier
 https://juejin.cn/post/7131019849047900197
 1. 使用editorConfig统一不同编辑器的编码风格
 # http://editorconfig.org
@@ -71,3 +72,145 @@ CNAME
 /public
 **/*.sh
 
+
+二. 配置eslint
+https://github.com/kaindy7633/blog/blob/main/front-end/%E5%9C%A8React%2BTypeScript%E9%A1%B9%E7%9B%AE%E4%B8%AD%E4%BD%BF%E7%94%A8Eslint%E5%92%8CPrettier.md
+1. 用ESLint来规范Typescript代码
+pnpm i -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+eslint: ESLint的核心代码
+@typescript-eslint/parser：ESLint的解析器，用于解析typescript，从而检查和规范Typescript代码
+@typescript-eslint/eslint-plugin：这是一个ESLint插件，包含了各类定义好的检测Typescript代码的规范
+在根目录下新建.eslintrc.js文件，该文件中定义了ESLint的基础配置，一个最为简单的配置如下所示
+module.exports = {
+    parser:  '@typescript-eslint/parser',                    //定义ESLint的解析器
+    extends: ['plugin:@typescript-eslint/recommended'],      //定义文件继承的子规范
+    plugins: ['@typescript-eslint'],                         //定义了该eslint文件所依赖的插件
+    env:{                                                    //指定代码的运行环境
+        browser: true,
+        node: true,
+    }
+}
+在ts项目中必须执行解析器为@typescript-eslint/parser，才能正确的检测和规范TS代码
+env环境变量配置，形如console属性只有在browser环境下才会存在，如果没有设置支持browser,那么可能报console is undefined的错误。
+
+2.用ESLint来规范React代码
+如果在你的TS项目中同时使用了React，那么为了检测和规范React代码的书写必须安装插件eslint-plugin-react，然后增加配置：
+module.exports = {
+
+    parser:  '@typescript-eslint/parser',
+    extends: [
+    'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended'
+    ],                              //使用推荐的React代码检测规范
+    plugins: ['@typescript-eslint'],
+    env:{
+        browser: true,
+        node: true,
+    },
+    settings: {             //自动发现React的版本，从而进行规范react代码
+        "react": {
+            "pragma": "React",
+            "version": "detect"
+        }
+    },
+    parserOptions: {        //指定ESLint可以解析JSX语法
+        "ecmaVersion": 2019,
+        "sourceType": 'module',
+        "ecmaFeatures":{
+            jsx:true
+        }
+    },
+    rules: {
+		// 自定义的React规范
+    }
+}
+在Rules中可以自定义你的React代码编码规范。
+
+3.结合Prettier和ESLint来规范代码
+Prettier中文的意思是漂亮的、美丽的，是一个流行的代码格式化的工具，我们来看如何结合ESLint来使用。首先我们需要安装三个依赖：
+pnpm i -D prettier eslint-config-prettier eslint-plugin-prettier
+其中：
+prettier：prettier插件的核心代码
+eslint-config-prettier：解决ESLint中的样式规范和prettier中样式规范的冲突，以prettier的样式规范为准，使ESLint中的样式规范自动失效
+eslint-plugin-prettier：将prettier作为ESLint规范来使用
+接着修改.eslintrc.js文件，引入prettier：
+上述新增的extends的配置中：
+prettier/@typescript-eslint：使得@typescript-eslint中的样式规范失效，遵循prettier中的样式规范
+plugin:prettier/recommended：使用prettier中的样式规范，且如果使得ESLint会检测prettier的格式问题，同样将格式问题以error的形式抛出
+
+4.husky、lint-staged、commitlint构建代码工作流
+https://www.cnblogs.com/UnfetteredMan/p/17358612.html
+工程化怎么能少的了这些利器呢!不过这些配置之后虽然便利，但由于每次提交之前都会检查一遍代码，会损耗一些时间。
+husky： 是一个 Git Hook 工具，借助 husky 我们可以在 git 提交的不同生命周期进行一些自动化操作
+lint-staged: 用于实现每次提交只检查本次提交所修改的文件
+commitlint: 提交时 commit 信息规范校验配置流程，每次提交时就会去检查你的commit-msg是否合规
+下载依赖
+pnpm i husky lint-staged @commitlint/cli @commitlint/config-conventional -D
+package.json 文件中添加 scripts
+"scripts": {
+    "prepare": "husky install",
+    "lint": "eslint src", 根据上面配置的来
+    "lint-staged": "lint-staged",
+    "commitlint": "commitlint --config commitlint.config.js -e -V"
+},
+"husky": {
+	"hooks": {
+		"pre-commit": "lint-staged",
+		"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+	}
+},
+"lint-staged": {
+	"src/**/*.{js,jsx,ts,tsx}": [
+		"prettier --write",
+		"eslint  --fix"
+	]
+},
+执行 pnpm run prepare
+根目录下生成了.husky 文件夹
+添加 pre-commit 钩子
+npx husky add .husky/pre-commit "pnpm run lint-staged"  手动创建add已废弃
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+pnpm run lint-staged
+
+创建 .lintstagedrc 配置文件
+{
+    "src/**/*.{js,vue}": "npm run lint"
+}
+添加 commit-msg 钩子
+npx husky add .husky/commit-msg "npm run commitlint" 手动创建add已废弃
+创建 commitlint.config.js 配置文件
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [
+      // type枚举
+      2,
+      'always',
+      [
+        'build', // 编译相关的修改，例如发布版本、对项目构建或者依赖的改动
+        'feat', // 新功能
+        'fix', // 修补bug
+        'docs', // 文档修改
+        'style', // 代码格式修改, 注意不是 css 修改
+        'refactor', // 重构
+        'perf', // 优化相关，比如提升性能、体验
+        'test', // 测试用例修改
+        'revert', // 代码回滚
+        'ci', // 持续集成修改
+        'config', // 配置修改
+        'chore', // 其他改动
+      ],
+    ],
+    'type-empty': [2, 'never'], // never: type不能为空; always: type必须为空
+    'type-case': [0, 'always', 'lower-case'], // type必须小写，upper-case大写，camel-case小驼峰，kebab-case短横线，pascal-case大驼峰，等等
+    'scope-empty': [0],
+    'scope-case': [0],
+    'subject-empty': [2, 'never'], // subject不能为空
+    'subject-case': [0],
+    'subject-full-stop': [0, 'never', '.'], // subject以.为结束标记
+    'header-max-length': [2, 'always', 72], // header最长72
+    'body-leading-blank': [0], // body换行
+    'footer-leading-blank': [0, 'always'], // footer以空行开头
+  },
+}
