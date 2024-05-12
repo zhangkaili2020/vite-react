@@ -137,6 +137,7 @@ eslint-plugin-prettier：将prettier作为ESLint规范来使用
 上述新增的extends的配置中：
 prettier/@typescript-eslint：使得@typescript-eslint中的样式规范失效，遵循prettier中的样式规范
 plugin:prettier/recommended：使用prettier中的样式规范，且如果使得ESLint会检测prettier的格式问题，同样将格式问题以error的形式抛出
+参考https://juejin.cn/post/7354045058265006107?share_token=AB5D07BF-3108-4CCA-B16A-AF1443A48521解决Prettier和ESLint的冲突
 
 4.husky、lint-staged、commitlint构建代码工作流
 https://www.cnblogs.com/UnfetteredMan/p/17358612.html
@@ -213,4 +214,18 @@ module.exports = {
     'body-leading-blank': [0], // body换行
     'footer-leading-blank': [0, 'always'], // footer以空行开头
   },
+}
+
+
+三. 配置less
+https://juejin.cn/post/7060351422885265415
+pnpm install less -D
+postcss 可以对某些 css 属性（比如 user-select）自动添加浏览器前缀
+pnpm install postcss -D (vite已内置postcss)
+npm install postcss-preset-env -D
+安装好之后，还需要配置 postcss，我们可以在项目目录下新建 postcss.config.js 文件，内容如下：
+module.exports = {
+  plugins: [
+    require('postcss-preset-env')
+  ]
 }
