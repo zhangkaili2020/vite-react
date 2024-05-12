@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
+// import { Routes, Route, Link } from 'react-router-dom'
+import { useRoutes, Link, BrowserRouter } from 'react-router-dom'
+import routers from './routes/index'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -6,9 +9,16 @@ import './App.less'
 
 function App() {
 	const [count, setCount] = useState(0)
+	const element = useRoutes(routers)
 
 	return (
 		<>
+			{/* <Routes>
+				<Route path='/' element={<div>1</div>} />
+				<Route path='about' element={<div>2</div>} />
+			</Routes> */}
+			{/* <Suspense fallback={<div>loading...</div>}>{element}</Suspense> */}
+			{element}
 			<div>
 				<a href="https://vitejs.dev" target="_blank">
 					<img src={viteLogo} className="logo" alt="Vite logo" />
